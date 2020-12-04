@@ -1,16 +1,21 @@
-inicio
-
 tarefa seguir{
 
-}
+    #TODO - TRACKING LINHA
+
+    #TODO - TRATAMENTO DAS CURVAS
+
 
 tarefa desviar{
-    
+    #TODO - DESVIO
 }
 
 tarefa pegar{
     
 }
+
+
+inicio
+
 
 
 fim
