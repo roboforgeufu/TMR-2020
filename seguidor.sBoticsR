@@ -1,21 +1,133 @@
-tarefa seguir{
+  #definição de variaveis
 
-    #TODO - TRACKING LINHA
+    numero wait = 400 #tempo de espera
+    numero us = 1 #sensor ultrassônico
+    numero lsleft = 2 #porta sensor de luz esquerda
+    numero lsright = 1 #porta sensor de luz direita
+    numero lsmid = 3 #porta sensor de luz meio
+    numero fwd = 100  #velocidade reta
+    numero turn = 200 #velocidade curva
 
-    #TODO - TRATAMENTO DAS CURVAS
+    booleano rampa = Falso
+
+    #definição de funções
+
+    tarefa subirGarra{
+        velocidadeatuador(150)
+        levantar(1000)
+    }
+
+    tarefa descerGarra{
+        velocidadeatuador(50)
+        baixar(1000)
+    }
 
 
-tarefa desviar{
-    #TODO - DESVIO
-}
+    tarefa green{ #vê a intersecção verde
 
-tarefa pegar{
+    se (cor(lsleft)=="VERDE" ou cor(lsright)=="VERDE") entao {  
+    frente(20)
+    esperar(10)
+          se (cor(lsleft) == "VERDE" e cor(lsright)=="BRANCO") entao {    
+            #curva 90º pra esquerda
+            escrever(1, "ESQUERDA")
+            frente (fwd)
+            esperar(500)
+            direita(negativo(turn))
+            esperar (wait)
+            enquanto(cor(lsleft) != "PRETO") farei{
+              direita(negativo(turn))
+            }
+          }
+
+          se (cor(lsright) == "VERDE" e cor(lsleft)=="BRANCO") entao {    
+            #curva 90º pra direita
+            escrever(1, "DIREITA")
+            frente (fwd)
+            esperar (wait)
+            esquerda(negativo(turn))
+            esperar (wait)
+            enquanto(cor(lsright) != "PRETO") farei{
+              esquerda(negativo(turn))
+            }
+          }
+          se (cor(lsright) == "VERDE" e cor(lsleft)=="VERDE") entao {
+            escrever(1, "VOLTAR") 
+            rotacionar (400, 180)   
+            }
+            }
+    }
+
+
+    tarefa seguir{
+      green()
+
+      se ((cor(lsright) == "BRANCO") e (cor(lsleft) == "BRANCO")) entao {   
+        #Se os dois sensores lerem branco andar pra frente
+          frente(150)
+        }
+
+        senao se ((cor(lsright) == "BRANCO") e (cor(lsleft) == "PRETO")) entao {     
+          mover(800,negativo(900))
+	esperar(30)
+        }
+
+        senao se ((cor(lsright) == "PRETO") e (cor(lsleft) == "BRANCO")) entao {    
+          #virar levemente para a direita
+	        mover(negativo(900),800)
+          esperar(30)
+        }
+        senao se ((cor(lsright) == "PRETO") e (cor(lsleft) == "PRETO")) entao {    
+            frente(fwd)
+            esperar(wait)
+        }
+    }
+
+
+
+    tarefa desviar{
+#melhorar desvio
+        rotacionar(400, negativo(60))
+        frente(400)
+        esperar(450)
+        rotacionar(400, 60)
+        enquanto(ultra(2) >=20)farei{
+            frente(200)
+            esperar(200)
+        }
+        enquanto(ultra(2) <=20)farei{
+            frente(200)
+        }
+        rotacionar(400, 90)
+        enquanto (cor(1)!= "PRETO" ou cor(2)!="PRETO") farei {
+          frente(200)
+        }
+    }
+
+    tarefa pegar{
+      escrever(1, virartexto(inclinacao()))
+    }
+
+    #==================MAIN================
+    inicio
+
+    subirGarra()
+    enquanto (verdadeiro) farei{
+      se (inclinacao() > 20) entao {
+        pegar()
+      }
+
+      se(ultra(us) >= 40)entao{
+        seguir()
+        escrever(2, cor(lsleft))
+        escrever(3, cor(lsright))
+      }
+      senao{
+        desviar()
+      }
+
+    }
+
     
-}
 
-
-inicio
-
-
-
-fim
+    fim
