@@ -10,6 +10,8 @@ numero turn = 150 #velocidade curva
 numero giroSPD = 350 #velocidade de giro
 numero cont = 0
 numero tempoIni = 0
+numero velocidade = 0
+numero intervaloTempo = 0
 
 #definição de funções
 
@@ -49,6 +51,11 @@ tarefa descerGarra{
     }
 }
 
+tarefa entregar{
+    parar()
+    baixar(500)
+    girarbaixo(500)
+}
 
 tarefa green{ #vê a intersecção verde
     se (cor(lsleft) == "VERDE") entao {    #curva 90º pra esquerda
@@ -125,43 +132,73 @@ tarefa curvaFixadaDireita{
 tarefa resgate{
     parar()
     descerGarra()
-    girarcima(110)
-    tempoIni = tempo()
-    enquanto(verdadeiro)farei{  
-        frente(200)
-        se(tempo() - tempoIni > 5000)entao{
-            tras(50)
-            esperar(500)
-            parar()
+    velocidade = 200
 
-            se(temvitima())entao{
-                # TODO: deixar a bolinha
-            }
-            se(anguloatuador() > 320 ou anguloatuador() < 20)entao{
+    tempoIni = tempo()
+    intervaloTempo = 4000
+    enquanto(verdadeiro)farei{
+        se(temvitima())entao{
+            velocidade = 100
+        } senao {
+            velocidade = 200
+        }
+
+        se(cor(3) == "PRETO" e (tempo() - tempoIni > intervaloTempo)) entao{
+            acenderled("VERMELHO")
+            se(temvitima()) entao {
+                entregar()
                 subirGarra()
+                apagarled()
+                # intervaloTempo = intervaloTempo * 0.7
             }
             curvaFixadaDireita()
+            descerGarra()
             tempoIni = tempo()
         }
-        se(temvitima() e (anguloatuador() > 320 ou anguloatuador() < 20))entao{
-            enquanto(ultra(1) > 48)farei{
-                frente(120)
-            }
-            parar()
-            subirGarra()
+
+        se((tempo() - tempoIni > intervaloTempo) e !temvitima()) entao {
+            acenderled("VERMELHO")
+            curvaFixadaDireita()
+            descerGarra()
+            tempoIni = tempo()
+        }senao {
+            acenderled("AZUL")
         }
-        se(ultra(1) < 55 ou (ultra(2) < 40 e !temvitima()))entao{
-            esperar(130)
+
+        frente(velocidade)
+        se(ultra(1) < 50)entao{
             parar()
-            se(anguloatuador() > 320 ou anguloatuador() < 20)entao{
+            se(anguloatuador() < 30 e angulogiroatuador() < 30)entao{
+                # Garra abaixada
                 subirGarra()
             }
+            
             curvaFixadaDireita()
-            tempoIni = tempo()
-            se(!temvitima())entao{
-                tras(90)
+
+            se(!temvitima() e ( anguloatuador() > 280 e anguloatuador() < 320 ) )entao{
+                # Garra levantada, não tem vitima
+                tras(30)
                 descerGarra()
             }
+            tempoIni = tempo()
+            escrever(3, "3")
+        }senao se ( ultra(2) < 100 e ultra(2) > 30 e !temvitima() ) entao {
+            esperar(100)
+            parar()
+            subirGarra()
+            curvaFixadaDireita()
+            escrever(3, "4")
+            tras(30)
+            descerGarra()
+            tempoIni = tempo()
+            enquanto(!temvitima() ou ultra(1) > 60)farei{
+                frente(100)
+            }
+            enquanto (ultra(1) > 50) farei {
+                frente(100)
+            }
+            subirGarra()
+            parar()
         }
     }
 }
@@ -186,7 +223,7 @@ tarefa rampa{
     senao se (cont!=0) entao{
         frente(300)
         acenderled("VERDE")
-        esperar(600)
+        esperar(470)
         resgate()
     }
 }
