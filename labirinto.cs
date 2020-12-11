@@ -55,8 +55,8 @@ for (int i=0; i<quadrados;i++){
 double direcaoInicial = 0;
 double direcaoFinal = 0;
 
-Action <int> curvaFixadaDireita = (voltas) => {
-//funcao que faz a curva de 90 graus
+Action curvaFixadaDireita = () => {
+	//funcao que faz a curva de 90 graus
 	direcaoInicial = Math.Round(bc.compass()/90)*90;
     direcaoFinal = (90* ( Math.Round(bc.compass()/90) +1 )) % 360;
 	
@@ -70,33 +70,39 @@ Action <int> curvaFixadaDireita = (voltas) => {
         bc.onTF(-1000, 1000);
         bc.wait(500);
     }
+
     
     while( bc.compass() < direcaoFinal & bc.compass() < 360){
         bc.onTF(-1000, 1000);
     }
     bc.onTF(0, 0);
+
 };
 
-Action <int> curvaFixadaEsquerda = (voltas) => {
-//funcao que faz a curva de 90 graus
+Action curvaFixadaEsquerda = () => {
+	//funcao que faz a curva de 90 graus
 	direcaoInicial = Math.Round(bc.compass()/90)*90;
-    direcaoFinal = (90* ( Math.Round(bc.compass()/90) +1 )) % 360;
+    direcaoFinal = (90* ( Math.Round(bc.compass()/90) -1 )) % 360;
 	
-	if(direcaoFinal == 0){
+	bc.printLCD(1, direcaoInicial.ToString());
+	bc.printLCD(2, direcaoFinal.ToString());
+
+	if(direcaoFinal == -90){
         //Adapta o resultado do resto pro caso em que 
         //a curva vai crescendo até chegar em 0 = 360
-        direcaoFinal = 359;
+        direcaoFinal = 270;
     }
 
-    if(direcaoInicial == 360){
+    if(direcaoInicial == 0){
         bc.onTF(1000, -1000);
         bc.wait(500);
     }
     
-    while( bc.compass() < direcaoFinal & bc.compass() < 360){
+    while( bc.compass() > direcaoFinal & bc.compass() > 1){
         bc.onTF(1000, -1000);
     }
     bc.onTF(0, 0);
+	bc.printLCD(3, bc.compass().ToString());
 };
 
 Func < int> random = () => { //funcao que retornchegar em aleatorio sendo 1 ou -1
@@ -108,10 +114,6 @@ Func < int> random = () => { //funcao que retornchegar em aleatorio sendo 1 ou -
 	}
 };
 
-int direcao = random();
-float distancia_sensor = 75;
-int vel_ang = 400;
-int ajustar = 0;
 
 //Direita
 if (direcao == 1){
