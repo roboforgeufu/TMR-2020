@@ -89,6 +89,39 @@ tarefa curvaFechada{
     }
 }
 
+numero direcaoInicial = 0
+numero direcaoFinal = 0
+tarefa curvaFixadaDireita{
+    # Valores truncados em multiplos de 90
+    direcaoInicial = arredondar(direcao()/90)*90
+    direcaoFinal = resto(90* ( arredondar(direcao()/90) +1 ), 360)
+    
+    # Alem de truncado em multiplos de 90, os valores da direcaoFinal
+    # vao de 0 a 360 e depois voltam a zero. O resto da divisao do valor por 360
+    # já faz isso de "voltar" a zero depois desse valor
+    
+    # escrever(1, virartexto(direcaoInicial))
+    # escrever(2, virartexto(direcaoFinal))
+
+    se(direcaoFinal == 0)entao{
+        # Adapta o resultado do resto pro caso em que 
+        # a curva vai crescendo até o valor 0 = 360
+        direcaoFinal = 359
+    }
+
+    se(direcaoInicial == 360)entao{
+        direita(1000)
+        esperar(500)
+    }
+    
+    enquanto( direcao() < direcaoFinal e direcao() < 360)farei{
+        direita(1000)
+    }
+    parar()
+
+    escrever(1, virartexto(direcao()))
+}
+
 tarefa resgate{
     parar()
     descerGarra()
@@ -107,26 +140,26 @@ tarefa resgate{
             se(anguloatuador() > 320 ou anguloatuador() < 20)entao{
                 subirGarra()
             }
-            rotacionar(1000, 90)
+            curvaFixadaDireita()
             tempoIni = tempo()
         }
         se(temvitima() e (anguloatuador() > 320 ou anguloatuador() < 20))entao{
-            enquanto(ultra(1) > 55)farei{
+            enquanto(ultra(1) > 48)farei{
                 frente(120)
             }
             parar()
             subirGarra()
         }
-        se(ultra(1) < 65 ou (ultra(2) < 40 e !temvitima()))entao{
+        se(ultra(1) < 55 ou (ultra(2) < 40 e !temvitima()))entao{
             esperar(130)
             parar()
             se(anguloatuador() > 320 ou anguloatuador() < 20)entao{
                 subirGarra()
             }
-            rotacionar(1000, 90)
+            curvaFixadaDireita()
             tempoIni = tempo()
             se(!temvitima())entao{
-                tras(150)
+                tras(90)
                 descerGarra()
             }
         }
