@@ -44,7 +44,7 @@ Action <float, int> turn = (forca, lado) => {
 };
 
 Action < int> andar = (quadrados) => {
-
+//funcao que anda de um centro do quadrado para o proximo
 for (int i=0; i<quadrados;i++){
 	bc.onTF(300, 300);
 	bc.wait(1250);
@@ -52,7 +52,7 @@ for (int i=0; i<quadrados;i++){
 	}
 };
 
-Func < int> random = () => {
+Func < int> random = () => { //funcao que retorna valor aleatorio sendo 1 ou -1
 	int a = bc.randomLimits(1, 2);
 	if (a == 1) {
 		return (1);
@@ -61,32 +61,58 @@ Func < int> random = () => {
 	}
 };
 
-int direcao = 1;
+int direcao = random();
 float distancia_sensor = 45;
+int vel_ang = 400;
 
-
-
-while(true){
-	//Ligar os motores pra frente
-	bc.printLCD(1, "SEGUIR RETO");
-	andar(1);
-	bc.wait(500);
-	if(bc.distance(1) >= distancia_sensor){
-		// Curva na direção padrão
-		bc.printLCD(1, "CURVA A DIREITA");
-		bc.onTFRot(400, direcao*90);}
-	else if (bc.distance(0) <= distancia_sensor) {
-		if(bc.distance(2) >= distancia_sensor){
-			bc.printLCD(1, "CURVA A ESQUERDA");
-			bc.onTFRot(400, direcao*-90);
+//Direita
+if (direcao == 1){
+	while(true){
+		bc.printLCD(2, direcao.ToString());
+		//Ligar os motores pra frente
+		bc.printLCD(1, "SEGUIR RETO");
+		andar(1);
+		bc.wait(500);
+		if(bc.distance(1) >= distancia_sensor){
+			// Curva na direção padrão
+			bc.printLCD(1, "CURVA A DIREITA");
+			bc.onTFRot(vel_ang, direcao*90);}
+		else if (bc.distance(0) <= distancia_sensor) {
+			if(bc.distance(2) >= distancia_sensor){
+				bc.printLCD(1, "CURVA A ESQUERDA");
+				bc.onTFRot(vel_ang, direcao*-90);
+			} 
+			else{
+				bc.printLCD(1, "MEIA VOLTA");
+				bc.onTFRot(vel_ang, direcao*180);
+			}
 		}
-		else{
-			bc.printLCD(1, "MEIA VOLTA");
-			bc.onTFRot(400, direcao*180);
-		}
-	}
-	
-}
 		
+	}
+}
+else{ //Esquerda
+	while(true){
+		bc.printLCD(2, direcao.ToString());
+		//Ligar os motores pra frente
+		bc.printLCD(1, "SEGUIR RETO");
+		andar(1);
+		bc.wait(500);
+		if(bc.distance(2) >= distancia_sensor){
+			// Curva na direção padrão
+			bc.printLCD(1, "CURVA A ESQUERDA");
+			bc.onTFRot(vel_ang, direcao*90);}
+		else if (bc.distance(0) <= distancia_sensor) {
+			if(bc.distance(1) >= distancia_sensor){
+				bc.printLCD(1, "CURVA A DIREITA");
+				bc.onTFRot(vel_ang, direcao*-90);
+			} 
+			else{
+				bc.printLCD(1, "MEIA VOLTA");
+				bc.onTFRot(vel_ang, direcao*180);
+			}
+		}
+		
+	}
+}	
 
 bc.onTF(0, 0);
