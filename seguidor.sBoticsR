@@ -6,11 +6,12 @@ numero lsleft = 2 #porta sensor de luz esquerda
 numero lsright = 1 #porta sensor de luz direita
 numero lsmid = 3 #porta sensor de luz meio
 numero fwd = 100  #velocidade reta
-numero turn = 200 #velocidade curva
-
-booleano rampa = Falso
+numero turn = 150 #velocidade curva
+numero cont = 0
+numero tempoIni = 0
 
 #definição de funções
+
 
 tarefa subirGarra{
     velocidadeatuador(150)
@@ -18,114 +19,172 @@ tarefa subirGarra{
 }
 
 tarefa descerGarra{
-    velocidadeatuador(50)
+    velocidadeatuador(150)
     baixar(1000)
 }
 
 
 tarefa green{ #vê a intersecção verde
-
-  se (cor(lsleft)=="VERDE" ou cor(lsright)=="VERDE") entao {  
-    frente(20)
-    esperar(10)
-    se (cor(lsleft) == "VERDE" e cor(lsright)=="BRANCO") entao {    
-      #curva 90º pra esquerda
-      escrever(1, "ESQUERDA")
-      frente (fwd)
-      esperar(500)
-      direita(negativo(turn))
-      esperar (wait)
-      enquanto(cor(lsleft) != "PRETO") farei{
+    se (cor(lsleft) == "VERDE") entao {    #curva 90º pra esquerda
+        frente (fwd)
+        esperar(500)
         direita(negativo(turn))
-      }
+        esperar (wait)
+        enquanto(cor(lsleft) != "PRETO") farei{
+            direita(negativo(turn))
+        }
     }
 
-    se (cor(lsright) == "VERDE" e cor(lsleft)=="BRANCO") entao {    
-      #curva 90º pra direita
-      escrever(1, "DIREITA")
-      frente (fwd)
-      esperar (wait)
-      esquerda(negativo(turn))
-      esperar (wait)
-      enquanto(cor(lsright) != "PRETO") farei{
+    se (cor(lsright) == "VERDE") entao {    #curva 90º pra direita
+        frente (fwd)
+        esperar (wait)
         esquerda(negativo(turn))
-      }
+        esperar (wait)
+        enquanto(cor(lsright) != "PRETO") farei{
+            esquerda(negativo(turn))
+        }
     }
-    se (cor(lsright) == "VERDE" e cor(lsleft)=="VERDE") entao {
-      escrever(1, "VOLTAR") 
-      rotacionar (400, 180)   
-    }
-  }
 }
 
+tarefa curvaFechada{
+    se ((cor(lsright) == "PRETO") e (cor(lsleft) == "PRETO")) entao {     #virar para a direita em 90º
+        frente(fwd)
+        esperar(50)
+        esperar(wait)
+        rotacionar(turn, 90)
+        esperar(wait)
+        se(cor(lsright)=="PRETO") entao{
+            parar()
+        }
+        senao{
+            enquanto(cor(lsright)=="BRANCO") farei{
+            esquerda(turn)
+            }
+        }
+    }
+}
+
+tarefa resgate{
+    parar()
+    descerGarra()
+    girarcima(110)
+    tempoIni = tempo()
+    enquanto(verdadeiro)farei{  
+        frente(200)
+        se(tempo() - tempoIni > 5000 e temvitima())entao{
+            girarbaixo(900)
+            girarcima(900)
+        }
+        se(temvitima() e (anguloatuador() > 320 ou anguloatuador() < 20))entao{
+            esperar(500)
+            parar()
+            girarbaixo(900)
+            subirGarra()
+        }
+        se(ultra(1) < 65 ou (ultra(2) < 40 e !temvitima()))entao{
+            esperar(200)
+            parar()
+            se(anguloatuador() > 320 ou anguloatuador() < 20)entao{
+                subirGarra()
+            }
+            rotacionar(1000, 90)
+            tempoIni = tempo()
+            se(!temvitima())entao{
+                tras(150)
+                descerGarra()
+            }
+        }
+    }
+}
+
+tarefa rampa{
+    se (inclinacao()>335 e ultra(2) <45) entao{
+        cont = cont + 1
+        se ((cor(lsright) == "BRANCO") e (cor(lsleft) == "BRANCO")) entao {
+            frente(300)
+        }
+  
+        senao se ((cor(lsright) == "BRANCO") e (cor(lsleft) == "PRETO")) entao {     
+            direita(negativo(turn))
+            esperar(wait)
+        }
+  
+        senao se ((cor(lsright) == "PRETO") e (cor(lsleft) == "BRANCO")) entao {    
+            esquerda(negativo(turn))
+            esperar(wait)
+        }
+    }
+    senao se (cont!=0) entao{
+        frente(300)
+        acenderled("VERDE")
+        esperar(200)
+        resgate()
+    }
+}
 
 tarefa seguir{
-  green()
+    green()
+    curvaFechada()
+    rampa()
 
-  se ((cor(lsright) == "BRANCO") e (cor(lsleft) == "BRANCO")) entao {   
-    #Se os dois sensores lerem branco andar pra frente
-    frente(150)
-  }
+    se ((cor(lsright) == "BRANCO") e (cor(lsleft) == "BRANCO")) entao {   #Se os dois sensores lerem branco andar pra frente
+        frente(fwd)
+    }
 
-  senao se ((cor(lsright) == "BRANCO") e (cor(lsleft) == "PRETO")) entao {     
-    mover(800,negativo(900))
-	  esperar(30)
-  }
+    senao se ((cor(lsright) == "BRANCO") e (cor(lsleft) == "PRETO")) entao {     #virar levemente para a esquerda
+        direita(negativo(turn))
+        esperar(wait)
+    }
 
-  senao se ((cor(lsright) == "PRETO") e (cor(lsleft) == "BRANCO")) entao {    
-    #virar levemente para a direita
-    mover(negativo(900),800)
-    esperar(30)
-  }
-  senao se ((cor(lsright) == "PRETO") e (cor(lsleft) == "PRETO")) entao {    
-    frente(fwd)
-    esperar(wait)
-  }
+    senao se ((cor(lsright) == "PRETO") e (cor(lsleft) == "BRANCO")) entao {     #virar levemente para a direita
+        esquerda(negativo(turn))
+        esperar(wait)
+    }
 }
-
 
 
 tarefa desviar{
-  #melhorar desvio
-  rotacionar(400, negativo(60))
-  frente(400)
-  esperar(450)
-  rotacionar(400, 60)
-  enquanto(ultra(2) >=20)farei{
-    frente(200)
-    esperar(200)
-  }
-  enquanto(ultra(2) <=20)farei{
-    frente(200)
-  }
-  rotacionar(400, 90)
-  enquanto (cor(1)!= "PRETO" ou cor(2)!="PRETO") farei {
-    frente(200)
-  }
+    rotacionar(400, negativo(60))
+    frente(400)
+    esperar(500)
+    rotacionar(400, 60)
+    farei{
+        enquanto(cor(1) == "BRANCO" e ultra(2) >=20)farei{
+            frente(100)
+        }
+        se(cor(1) != "BRANCO" ou cor(2) != "BRANCO")entao{
+            rotacionar(400, negativo(45))
+            frente(400)
+            esperar(400)
+            rotacionar(400, negativo(45))
+            parar()
+        } senao {
+            frente(400)
+            esperar(500)
+            rotacionar(400, 90)
+        }
+    }enquanto(cor(1) == "BRANCO")
+
 }
 
 tarefa pegar{
-  escrever(1, virartexto(inclinacao()))
+
 }
 
-#==================MAIN================
 
+#==================MAIN================
 inicio
 
-subirGarra()
-enquanto (verdadeiro) farei{
-  se (inclinacao() > 20) entao {
-    pegar()
-  }
+cont = 0
 
-  se(ultra(us) >= 40)entao{
-    seguir()
-    escrever(2, cor(lsleft))
-    escrever(3, cor(lsright))
-  }
-  senao{
-    desviar()
-  }
+subirGarra()
+enquanto (3>1) farei{
+    se(ultra(us) >= 25)entao{
+        seguir()
+    }
+    senao{
+        desviar()
+    }
 }
 
 fim
