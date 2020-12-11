@@ -52,7 +52,54 @@ for (int i=0; i<quadrados;i++){
 	}
 };
 
-Func < int> random = () => { //funcao que retorna valor aleatorio sendo 1 ou -1
+double direcaoInicial = 0;
+double direcaoFinal = 0;
+
+Action <int> curvaFixadaDireita = (voltas) => {
+//funcao que faz a curva de 90 graus
+	direcaoInicial = Math.Round(bc.compass()/90)*90;
+    direcaoFinal = (90* ( Math.Round(bc.compass()/90) +1 )) % 360;
+	
+	if(direcaoFinal == 0){
+        //Adapta o resultado do resto pro caso em que 
+        // a curva vai crescendo até chegar em 0 = 360
+        direcaoFinal = 359;
+    }
+
+    if(direcaoInicial == 360){
+        bc.onTF(-1000, 1000);
+        bc.wait(500);
+    }
+    
+    while( bc.compass() < direcaoFinal & bc.compass() < 360){
+        bc.onTF(-1000, 1000);
+    }
+    bc.onTF(0, 0);
+};
+
+Action <int> curvaFixadaEsquerda = (voltas) => {
+//funcao que faz a curva de 90 graus
+	direcaoInicial = Math.Round(bc.compass()/90)*90;
+    direcaoFinal = (90* ( Math.Round(bc.compass()/90) +1 )) % 360;
+	
+	if(direcaoFinal == 0){
+        //Adapta o resultado do resto pro caso em que 
+        //a curva vai crescendo até chegar em 0 = 360
+        direcaoFinal = 359;
+    }
+
+    if(direcaoInicial == 360){
+        bc.onTF(1000, -1000);
+        bc.wait(500);
+    }
+    
+    while( bc.compass() < direcaoFinal & bc.compass() < 360){
+        bc.onTF(1000, -1000);
+    }
+    bc.onTF(0, 0);
+};
+
+Func < int> random = () => { //funcao que retornchegar em aleatorio sendo 1 ou -1
 	int a = bc.randomLimits(1, 2);
 	if (a == 1) {
 		return (1);
@@ -83,11 +130,12 @@ if (direcao == 1){
 		if(bc.distance(1) >= distancia_sensor){
 			// Curva na direção padrão
 			bc.printLCD(1, "CURVA A DIREITA");
-			bc.onTFRot(vel_ang, direcao*89);}
+			curvaFixadaDireita(1);
+			}
 		else if (bc.distance(0) <= distancia_sensor) {
 			if(bc.distance(2) >= distancia_sensor){
 				bc.printLCD(1, "CURVA A ESQUERDA");
-				bc.onTFRot(vel_ang, direcao*-89);
+				curvaFixadaEsquerda(1);
 			} 
 			else{
 				bc.printLCD(1, "MEIA VOLTA");
@@ -113,11 +161,12 @@ else{ //Esquerda
 		if(bc.distance(2) >= distancia_sensor){
 			// Curva na direção padrão
 			bc.printLCD(1, "CURVA A ESQUERDA");
-			bc.onTFRot(vel_ang, direcao*89);}
+			curvaFixadaEsquerda(1);
+			}
 		else if (bc.distance(0) <= distancia_sensor) {
 			if(bc.distance(1) >= distancia_sensor){
 				bc.printLCD(1, "CURVA A DIREITA");
-				bc.onTFRot(vel_ang, direcao*-90);
+				curvaFixadaDireita(1);
 			} 
 			else{
 				bc.printLCD(1, "MEIA VOLTA");
