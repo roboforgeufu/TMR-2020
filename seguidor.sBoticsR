@@ -7,6 +7,7 @@ numero lsright = 1 #porta sensor de luz direita
 numero lsmid = 3 #porta sensor de luz meio
 numero fwd = 100  #velocidade reta
 numero turn = 150 #velocidade curva
+numero giroSPD = 350 #velocidade de giro
 numero cont = 0
 numero tempoIni = 0
 
@@ -53,20 +54,20 @@ tarefa green{ #vê a intersecção verde
     se (cor(lsleft) == "VERDE") entao {    #curva 90º pra esquerda
         frente (fwd)
         esperar(500)
-        direita(negativo(turn))
+        direita(negativo(giroSPD))
         esperar (wait)
         enquanto(cor(lsleft) != "PRETO") farei{
-            direita(negativo(turn))
+            direita(negativo(giroSPD))
         }
     }
 
     se (cor(lsright) == "VERDE") entao {    #curva 90º pra direita
         frente (fwd)
-        esperar (wait)
-        esquerda(negativo(turn))
+        esperar (500)
+        esquerda(negativo(giroSPD))
         esperar (wait)
         enquanto(cor(lsright) != "PRETO") farei{
-            esquerda(negativo(turn))
+            esquerda(negativo(giroSPD))
         }
     }
 }
@@ -74,16 +75,15 @@ tarefa green{ #vê a intersecção verde
 tarefa curvaFechada{
     se ((cor(lsright) == "PRETO") e (cor(lsleft) == "PRETO")) entao {     #virar para a direita em 90º
         frente(fwd)
-        esperar(50)
-        esperar(wait)
-        rotacionar(turn, 90)
+        esperar(700)
+        rotacionar(giroSPD, 60)
         esperar(wait)
         se(cor(lsright)=="PRETO") entao{
             parar()
         }
         senao{
             enquanto(cor(lsright)=="BRANCO") farei{
-            esquerda(turn)
+            esquerda(giroSPD)
             }
         }
     }
@@ -168,13 +168,13 @@ tarefa seguir{
     }
 
     senao se ((cor(lsright) == "BRANCO") e (cor(lsleft) == "PRETO")) entao {     #virar levemente para a esquerda
-        direita(negativo(turn))
-        esperar(wait)
+        esquerda(turn)
+        esperar(150)
     }
 
     senao se ((cor(lsright) == "PRETO") e (cor(lsleft) == "BRANCO")) entao {     #virar levemente para a direita
-        esquerda(negativo(turn))
-        esperar(wait)
+        direita(turn)
+        esperar(150)
     }
 }
 
