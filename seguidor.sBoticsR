@@ -12,6 +12,7 @@ numero cont = 0
 numero tempoIni = 0
 numero velocidade = 0
 numero intervaloTempo = 0
+numero time = temporizador() #tempo decorrido
 
 #definição de funções
 
@@ -58,23 +59,49 @@ tarefa entregar{
 }
 
 tarefa green{ #vê a intersecção verde
-    se (cor(lsleft) == "VERDE") entao {    #curva 90º pra esquerda
-        frente (fwd)
-        esperar(500)
-        direita(negativo(giroSPD))
-        esperar (wait)
-        enquanto(cor(lsleft) != "PRETO") farei{
-            direita(negativo(giroSPD))
+    se((cor(lsleft) == "VERDE") e (cor(lsright)=="VERDE")) entao{
+    rotacionar(200,150)
+    enquanto(cor(lsleft) == "BRANCO") farei{
+      direita(giroSPD)
+    }
+    }
+    senao se (cor(lsleft) == "VERDE") entao {
+        parar()
+
+        se(cor(lsright) == "VERDE") entao{ #meia volta
+          rotacionar(200,150)
+          enquanto(cor(lsleft) == "BRANCO") farei{
+            direita(giroSPD)
+          }
         }
+        senao{ #curva 90º pra esquerda
+            frente (fwd)
+            esperar(1000)
+            direita(negativo(giroSPD))
+            esperar (2000)
+            enquanto(cor(lsright) != "PRETO") farei{
+                direita(negativo(giroSPD))
+            }
+      }
     }
 
-    se (cor(lsright) == "VERDE") entao {    #curva 90º pra direita
-        frente (fwd)
-        esperar (500)
-        esquerda(negativo(giroSPD))
-        esperar (wait)
-        enquanto(cor(lsright) != "PRETO") farei{
+    senao se (cor(lsright) == "VERDE") entao {    #curva 90º pra direita
+        parar()
+
+        se(cor(lsleft) == "VERDE") entao{ #meia volta
+          rotacionar(200,negativo(150))
+          enquanto(cor(lsright) == "BRANCO") farei{
+            esquerda(giroSPD)
+          }
+        }
+        senao{
+            frente (fwd)
+            esperar (1000)
             esquerda(negativo(giroSPD))
+            esperar (2000)
+            enquanto(cor(lsleft) != "PRETO") farei{
+                esquerda(negativo(giroSPD))
+            }
         }
     }
 }
@@ -82,17 +109,23 @@ tarefa green{ #vê a intersecção verde
 tarefa curvaFechada{
     se ((cor(lsright) == "PRETO") e (cor(lsleft) == "PRETO")) entao {     #virar para a direita em 90º
         frente(fwd)
-        esperar(700)
-        rotacionar(giroSPD, 60)
-        esperar(wait)
-        se(cor(lsright)=="PRETO") entao{
-            parar()
-        }
-        senao{
-            enquanto(cor(lsright)=="BRANCO") farei{
-            esquerda(giroSPD)
+        esperar(1200)
+        esquerda(giroSPD)
+        esperar(400)
+        zerartemporizador()
+        repita 50 vezes{
+            direita(giroSPD)
+            esperar(200)
+            registrarnumero(time)
+            se((cor(lsleft)=="PRETO") ou time>2000) entao{
+                interromper()
             }
         }
+        enquanto(cor(lsright)=="BRANCO")farei{
+            esquerda(giroSPD)
+            esperar(100)
+        }
+
     }
 }
 
@@ -233,50 +266,75 @@ tarefa seguir{
     curvaFechada()
     rampa()
 
-    se ((cor(lsright) == "BRANCO") e (cor(lsleft) == "BRANCO")) entao {   #Se os dois sensores lerem branco andar pra frente
-        frente(fwd)
-    }
+    se ((cor(lsright) == "BRANCO") e (cor(lsleft) == "BRANCO")) entao {
+      #Se os dois sensores lerem branco andar pra frente
+        frente(150)
+      }
 
-    senao se ((cor(lsright) == "BRANCO") e (cor(lsleft) == "PRETO")) entao {     #virar levemente para a esquerda
-        esquerda(turn)
-        esperar(150)
-    }
+      senao se ((cor(lsright) == "BRANCO") e (cor(lsleft) == "PRETO")) entao {
+        mover(800,negativo(900))
+esperar(30)
+      }
 
-    senao se ((cor(lsright) == "PRETO") e (cor(lsleft) == "BRANCO")) entao {     #virar levemente para a direita
-        direita(turn)
-        esperar(150)
-    }
+      senao se ((cor(lsright) == "PRETO") e (cor(lsleft) == "BRANCO")) entao {
+        #virar levemente para a direita
+        mover(negativo(900),800)
+        esperar(30)
+      }
 }
 
-
+booleano achou = falso
+numero temp = 0
 tarefa desviar{
-    rotacionar(400, negativo(60))
-    frente(400)
+    rotacionar(500, 45)
+    tempoIni = tempo()
+    achou = falso
+    frente(100)
     esperar(500)
-    rotacionar(400, 60)
-    farei{
-        enquanto(cor(1) == "BRANCO" e ultra(2) >=20)farei{
+    enquanto (tempo() - tempoIni < 1500 e !achou) farei {
+        escreverbooleano(3, achou)
+        escrever(2, cor(lsright))
+        escrever(1, virartexto(tempo() - tempoIni))
+
+        frente(100)
+        se (cor(lsright) == "PRETO") entao {
+            achou = verdadeiro
+        } 
+    }
+    se(!achou)entao{
+        tras(100)
+        temp = 500 + (tempo()-tempoIni)
+        esperar(temp)
+        parar()
+        rotacionar(500, negativo(90))
+        enquanto (tempo() - tempoIni < 1500 e !achou) farei {
+            escreverbooleano(3, achou)
+            escrever(2, cor(lsright))
+            escrever(1, virartexto(tempo() - tempoIni))
+
             frente(100)
+            se (cor(lsleft) == "PRETO") entao {
+                achou = verdadeiro
+            } 
         }
-        se(cor(1) != "BRANCO" ou cor(2) != "BRANCO")entao{
-            rotacionar(400, negativo(45))
-            frente(400)
-            esperar(400)
-            rotacionar(400, negativo(45))
-            parar()
-        } senao {
-            frente(400)
-            esperar(500)
-            rotacionar(400, 90)
+        se(!achou)entao{
+            rotacionar(500, 90)
+            enquanto (!achou) farei {
+                escreverbooleano(3, achou)
+                escrever(2, cor(lsright))
+                escrever(1, virartexto(tempo() - tempoIni))
+
+                frente(100)
+                se (cor(lsright) == "PRETO") entao {
+                    achou = verdadeiro
+                } 
+            }
         }
-    }enquanto(cor(1) == "BRANCO")
+    }
 
+    parar()
+    esperar(10000)
 }
-
-tarefa pegar{
-
-}
-
 
 #==================MAIN================
 inicio
@@ -285,7 +343,8 @@ cont = 0
 
 subirGarra()
 enquanto (3>1) farei{
-    se(ultra(us) >= 25)entao{
+    escrever(1, virartexto(ultra(us)))
+    se(ultra(us) >= 35)entao{
         seguir()
     }
     senao{
