@@ -14,13 +14,38 @@ numero tempoIni = 0
 
 
 tarefa subirGarra{
-    velocidadeatuador(150)
-    levantar(1000)
+    velocidadeatuador(120)
+    levantar(100)
+    enquanto(anguloatuador() < 290 ou anguloatuador() > 295)farei {
+        escrever(1, virartexto(anguloatuador()))
+        escrever(2, virartexto(angulogiroatuador()))
+        levantar(5)
+        girarbaixo(20)
+    }
 }
 
 tarefa descerGarra{
-    velocidadeatuador(150)
-    baixar(1000)
+    velocidadeatuador(120)
+    baixar(100)
+    enquanto(anguloatuador() > 290 ou anguloatuador() < 7)farei {
+        escrever(1, virartexto(anguloatuador()))
+        escrever(2, virartexto(angulogiroatuador()))
+        baixar(5)
+        girarcima(10)
+    }
+    se (angulogiroatuador() > 8 e angulogiroatuador() < 100) entao {
+        enquanto(angulogiroatuador() > 8)farei{
+            escrever(1, virartexto(anguloatuador()))
+            escrever(2, virartexto(angulogiroatuador()))
+            girarbaixo(10)
+        }
+    } senao {
+        enquanto(angulogiroatuador() < 8 ou angulogiroatuador() > 300)farei{
+            escrever(1, virartexto(anguloatuador()))
+            escrever(2, virartexto(angulogiroatuador()))
+            girarcima(10)
+        }
+    }
 }
 
 
@@ -71,18 +96,29 @@ tarefa resgate{
     tempoIni = tempo()
     enquanto(verdadeiro)farei{  
         frente(200)
-        se(tempo() - tempoIni > 5000 e temvitima())entao{
-            girarbaixo(900)
-            girarcima(900)
-        }
-        se(temvitima() e (anguloatuador() > 320 ou anguloatuador() < 20))entao{
+        se(tempo() - tempoIni > 5000)entao{
+            tras(50)
             esperar(500)
             parar()
-            girarbaixo(900)
+
+            se(temvitima())entao{
+                # TODO: deixar a bolinha
+            }
+            se(anguloatuador() > 320 ou anguloatuador() < 20)entao{
+                subirGarra()
+            }
+            rotacionar(1000, 90)
+            tempoIni = tempo()
+        }
+        se(temvitima() e (anguloatuador() > 320 ou anguloatuador() < 20))entao{
+            enquanto(ultra(1) > 55)farei{
+                frente(120)
+            }
+            parar()
             subirGarra()
         }
         se(ultra(1) < 65 ou (ultra(2) < 40 e !temvitima()))entao{
-            esperar(200)
+            esperar(130)
             parar()
             se(anguloatuador() > 320 ou anguloatuador() < 20)entao{
                 subirGarra()
@@ -117,7 +153,7 @@ tarefa rampa{
     senao se (cont!=0) entao{
         frente(300)
         acenderled("VERDE")
-        esperar(200)
+        esperar(600)
         resgate()
     }
 }
