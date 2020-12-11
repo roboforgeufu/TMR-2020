@@ -62,27 +62,30 @@ Func < int> random = () => {
 };
 
 int direcao = 1;
+float distancia_sensor = 45;
 
 
 
 while(true){
 	//Ligar os motores pra frente
+	bc.printLCD(1, "SEGUIR RETO");
 	andar(1);
 	bc.wait(500);
-	if(bc.distance(1) >= 40){
+	if(bc.distance(1) >= distancia_sensor){
 		// Curva na direção padrão
+		bc.printLCD(1, "CURVA A DIREITA");
 		bc.onTFRot(400, direcao*90);}
-	else if(bc.distance(0) < 35){
-		// Frente bloqueada
-		if(bc.distance(2) > 35){
-			// Curva na direção oposta
+	else if (bc.distance(0) <= distancia_sensor) {
+		if(bc.distance(2) >= distancia_sensor){
+			bc.printLCD(1, "CURVA A ESQUERDA");
 			bc.onTFRot(400, direcao*-90);
-			andar(1);
-		} else {
-			// Meia volta
+		}
+		else{
+			bc.printLCD(1, "MEIA VOLTA");
 			bc.onTFRot(400, direcao*180);
 		}
 	}
+	
 }
 		
 
