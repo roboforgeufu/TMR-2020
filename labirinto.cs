@@ -62,7 +62,7 @@ Func < int> random = () => { //funcao que retorna valor aleatorio sendo 1 ou -1
 };
 
 int direcao = random();
-float distancia_sensor = 60;
+float distancia_sensor = 75;
 int vel_ang = 400;
 int ajustar = 0;
 
@@ -113,11 +113,11 @@ else{ //Esquerda
 		if(bc.distance(2) >= distancia_sensor){
 			// Curva na direção padrão
 			bc.printLCD(1, "CURVA A ESQUERDA");
-			bc.onTFRot(vel_ang, direcao*88);}
+			bc.onTFRot(vel_ang, direcao*89);}
 		else if (bc.distance(0) <= distancia_sensor) {
 			if(bc.distance(1) >= distancia_sensor){
 				bc.printLCD(1, "CURVA A DIREITA");
-				bc.onTFRot(vel_ang, direcao*-88);
+				bc.onTFRot(vel_ang, direcao*-90);
 			} 
 			else{
 				bc.printLCD(1, "MEIA VOLTA");
