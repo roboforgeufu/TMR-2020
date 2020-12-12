@@ -47,10 +47,11 @@ Action < int> andar = (quadrados) => {
 //funcao que anda de um centro do quadrado para o proximo
 for (int i=0; i<quadrados;i++){
 	bc.onTF(300, 300);
-	bc.wait(1325);
+	bc.wait(1250);
 	bc.onTF(0, 0);
 	}
 };
+
 
 double direcaoInicial = 0;
 double direcaoFinal = 0;
@@ -114,16 +115,17 @@ Func < int> random = () => { //funcao que retornchegar em aleatorio sendo 1 ou -
 	}
 };
 
+int direcao = random();
+float distancia_sensor = 75;
+int vel_ang = 400;
+
+bc.onTF(-300, -300);
+bc.wait(100);
+bc.onTF(0, 0);
 
 //Direita
 if (direcao == 1){
 	while(true){
-		if(ajustar == 0){
-		bc.onTF(-300, -300);
-		bc.wait(100);
-		bc.onTF(0, 0);
-		ajustar = 1;
-		}
 		bc.printLCD(2, direcao.ToString());
 		//Ligar os motores pra frente
 		bc.printLCD(1, "SEGUIR RETO");
@@ -132,12 +134,12 @@ if (direcao == 1){
 		if(bc.distance(1) >= distancia_sensor){
 			// Curva na direção padrão
 			bc.printLCD(1, "CURVA A DIREITA");
-			curvaFixadaDireita(1);
+			curvaFixadaDireita();
 			}
 		else if (bc.distance(0) <= distancia_sensor) {
 			if(bc.distance(2) >= distancia_sensor){
 				bc.printLCD(1, "CURVA A ESQUERDA");
-				curvaFixadaEsquerda(1);
+				curvaFixadaEsquerda();
 			} 
 			else{
 				bc.printLCD(1, "MEIA VOLTA");
@@ -149,12 +151,6 @@ if (direcao == 1){
 }
 else{ //Esquerda
 	while(true){
-			if(ajustar == 0){
-		bc.onTF(-300, -300);
-		bc.wait(100);
-		bc.onTF(0, 0);
-		ajustar = 1;
-		}
 		bc.printLCD(2, direcao.ToString());
 		//Ligar os motores pra frente
 		bc.printLCD(1, "SEGUIR RETO");
@@ -163,12 +159,12 @@ else{ //Esquerda
 		if(bc.distance(2) >= distancia_sensor){
 			// Curva na direção padrão
 			bc.printLCD(1, "CURVA A ESQUERDA");
-			curvaFixadaEsquerda(1);
+			curvaFixadaEsquerda();
 			}
 		else if (bc.distance(0) <= distancia_sensor) {
 			if(bc.distance(1) >= distancia_sensor){
 				bc.printLCD(1, "CURVA A DIREITA");
-				curvaFixadaDireita(1);
+				curvaFixadaDireita();
 			} 
 			else{
 				bc.printLCD(1, "MEIA VOLTA");
