@@ -302,14 +302,15 @@ tarefa desviar{
         } 
     }
     se(!achou)entao{
+        temp = 200 + (tempo()-tempoIni)
         tras(100)
-        temp = 500 + (tempo()-tempoIni)
         esperar(temp)
         parar()
         rotacionar(500, negativo(90))
+        frente(100)
+        esperar(500)
+        tempoIni = tempo()
         enquanto (tempo() - tempoIni < 1500 e !achou) farei {
-            escreverbooleano(3, achou)
-            escrever(2, cor(lsright))
             escrever(1, virartexto(tempo() - tempoIni))
 
             frente(100)
@@ -319,13 +320,14 @@ tarefa desviar{
         }
         se(!achou)entao{
             rotacionar(500, 90)
+            frente(100)
             enquanto (!achou) farei {
                 escreverbooleano(3, achou)
                 escrever(2, cor(lsright))
                 escrever(1, virartexto(tempo() - tempoIni))
 
                 frente(100)
-                se (cor(lsright) == "PRETO") entao {
+                se (cor(lsleft) == "PRETO") entao {
                     achou = verdadeiro
                 } 
             }
@@ -333,7 +335,6 @@ tarefa desviar{
     }
 
     parar()
-    esperar(10000)
 }
 
 #==================MAIN================
