@@ -118,6 +118,7 @@ Func < int> random = () => { //funcao que retornchegar em aleatorio sendo 1 ou -
 int direcao = random();
 float distancia_sensor = 75;
 int vel_ang = 400;
+int ilha = 0;
 
 bc.onTF(-300, -300);
 bc.wait(100);
@@ -134,6 +135,10 @@ if (direcao == 1){
 		if(bc.distance(1) >= distancia_sensor){
 			// Curva na direção padrão
 			bc.printLCD(1, "CURVA A DIREITA");
+			if (ilha == 0){
+				curvaFixadaEsquerda();
+				ilha++;
+			}
 			curvaFixadaDireita();
 			}
 		else if (bc.distance(0) <= distancia_sensor) {
@@ -159,6 +164,10 @@ else{ //Esquerda
 		if(bc.distance(2) >= distancia_sensor){
 			// Curva na direção padrão
 			bc.printLCD(1, "CURVA A ESQUERDA");
+			if (ilha == 0){
+				curvaFixadaDireita();
+				ilha++;
+			}
 			curvaFixadaEsquerda();
 			}
 		else if (bc.distance(0) <= distancia_sensor) {
