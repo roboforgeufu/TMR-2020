@@ -286,7 +286,7 @@ esperar(30)
 booleano achou = falso
 numero temp = 0
 tarefa desviar{
-    rotacionar(500, 45)
+    rotacionar(500, negativo(35))
     tempoIni = tempo()
     achou = falso
     frente(100)
@@ -297,7 +297,7 @@ tarefa desviar{
         escrever(1, virartexto(tempo() - tempoIni))
 
         frente(100)
-        se (cor(lsright) == "PRETO") entao {
+        se (cor(lsleft) == "PRETO") entao {
             achou = verdadeiro
         } 
     }
@@ -306,7 +306,7 @@ tarefa desviar{
         tras(100)
         esperar(temp)
         parar()
-        rotacionar(500, negativo(90))
+        rotacionar(500, 70)
         frente(100)
         esperar(500)
         tempoIni = tempo()
@@ -314,16 +314,16 @@ tarefa desviar{
             escrever(1, virartexto(tempo() - tempoIni))
 
             frente(100)
-            se (cor(lsleft) == "PRETO") entao {
+            se (cor(lsright) == "PRETO") entao {
                 achou = verdadeiro
             } 
         }
         se(!achou)entao{
-            rotacionar(500, 90)
+            rotacionar(500, negativo(70))
             frente(100)
             enquanto (!achou) farei {
                 escreverbooleano(3, achou)
-                escrever(2, cor(lsright))
+                escrever(2, cor(lsleft))
                 escrever(1, virartexto(tempo() - tempoIni))
 
                 frente(100)
